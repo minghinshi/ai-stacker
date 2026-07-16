@@ -1,5 +1,9 @@
 export type PieceType = "I" | "J" | "L" | "O" | "S" | "T" | "Z";
 
+// 0: No rotation
+// 1: Rotated CW
+// 2: Rotated 180
+// 3: Rotated CCW
 export type RotationState = 0 | 1 | 2 | 3;
 
 export type Cell = PieceType | null;
