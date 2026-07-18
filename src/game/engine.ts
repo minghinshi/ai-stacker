@@ -43,8 +43,14 @@ function refillQueue(
 
 // --- Piece helpers -----------------------------------------------------
 
+// Spawn so that there are 20 rows beneath the active piece.
+// The board is 40 rows tall, and rows are 0-indexed top-down (0 = top, 39 = bottom).
+// Every piece's bottom minos sit at bounding-box row 1 in spawn orientation.
+// SPAWN_ROW = 18 -> bottom minos at row 18 + 1 = 19, so there are 20 rows beneath.
+const SPAWN_ROW = 18;
+
 function spawnPiece(type: PieceType): ActivePiece {
-  return { type, rotation: 0, row: 0, col: SPAWN_COL[type] };
+  return { type, rotation: 0, row: SPAWN_ROW, col: SPAWN_COL[type] };
 }
 
 function isValidPosition(board: Board, piece: ActivePiece): boolean {
