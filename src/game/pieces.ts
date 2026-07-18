@@ -1,7 +1,7 @@
 import type { PieceType, RotationState } from "./types";
 
 export const BOARD_WIDTH = 10;
-export const BOARD_HEIGHT = 20;
+export const BOARD_HEIGHT = 40;
 
 export const PIECE_COLORS: Record<PieceType, string> = {
   I: "#22d3ee",
