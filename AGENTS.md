@@ -6,7 +6,13 @@ AI stacker is a toy project for learning building applications that use AI model
 
 Users can choose which two AI models to battle against each other. Once the user starts the game, both models undergo an agent loop as follows: The web application will send the AI model the state of the game, including the well and the next pieces. The AI model will respond with the sequence of actions to place the next piece. So, to place an I piece vertically at column 1, the model responds with "rotate CCW, DAS to the left, hard drop". The game continues until either a model loses or 2 minutes have elapsed.
 
-Technology stack: Vite + TypeScript + React Compiler.
+- Technology stack: Vite + TypeScript + React Compiler.
+- Current status: Implementing stacker logic. AI agent and 1v1 not yet implemented.
+
+## Testing instructions
+
+- After changing the code, run `npm run lint`. No need to run other commands.
+- If there are linting warnings or errors, fix and lint again until they no longer appear.
 
 ## Game rules
 
