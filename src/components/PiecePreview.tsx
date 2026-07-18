@@ -1,5 +1,7 @@
-import { PIECE_COLORS, getPreviewGrid } from "../game/pieces";
+import { useEffect, useRef } from "react";
+import { getPreviewGrid } from "../game/pieces";
 import type { PieceType } from "../game/types";
+import { drawMinoGrid, type MinoCell } from "./canvas/drawMinos";
 
 interface PiecePreviewProps {
   type: PieceType | null;
@@ -8,25 +10,23 @@ interface PiecePreviewProps {
 }
 
 export function PiecePreview({ type, label, dimmed = false }: PiecePreviewProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const grid: MinoCell[][] = type
+      ? getPreviewGrid(type).map((row) =>
+          row.map((cell) => (cell ? { kind: "filled" as const, type: cell } : null)),
+        )
+      : [];
+    drawMinoGrid(canvas, grid, { bg: null, dimmed });
+  }, [type, dimmed]);
+
   return (
     <div className={`piece-preview ${dimmed ? "dimmed" : ""}`}>
       <div className="piece-preview-label">{label}</div>
-      <div className="piece-preview-grid">
-        {type
-          ? getPreviewGrid(type).map((row, r) =>
-              row.map((cell, c) => {
-                if (!cell) return <div key={`${r}-${c}`} className="preview-cell empty" />;
-                return (
-                  <div
-                    key={`${r}-${c}`}
-                    className="preview-cell filled"
-                    style={{ backgroundColor: PIECE_COLORS[cell] }}
-                  />
-                );
-              }),
-            )
-          : null}
-      </div>
+      <canvas ref={canvasRef} className="piece-preview-canvas" />
     </div>
   );
 }
