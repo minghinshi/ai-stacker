@@ -19,6 +19,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 60px;
 }
 
 .right-panel .piece-preview:nth-child(1) {
@@ -29,14 +30,28 @@
 
 .board-container {
   position: relative;
+  height: 660px;
+}
+
+/* U-shaped border around the visual board (left, right, bottom — no top).
+   Visual board starts 2 rows (60px) below the board element top (row 20). */
+.board-container::after {
+  content: "";
+  position: absolute;
+  inset: 60px 0 0 0;
+  border-left: 2px solid var(--border);
+  border-right: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  border-radius: 0 0 4px 4px;
+  pointer-events: none;
 }
 
 .board {
   display: block;
   width: 300px;
   height: 1200px;
-  border: 2px solid var(--border);
-  border-radius: 4px;
+  position: relative;
+  top: -540px;
 }
 
 /* --- Piece preview --- */
