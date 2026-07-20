@@ -40,7 +40,9 @@ Refer to the [Hard Drop wiki](https://harddrop.com/wiki/Tetris_Wiki) for Tetris 
 
 ### Sizes and locations
 
-- The board is internally 40 rows and 10 columns.
-- The "visual board" is the portion of the board in the bottom 20 rows.
+- The board is internally 40 rows and 10 columns. All 40 rows are rendered.
+- The _visual board_ is the portion of the board in the bottom 20 rows.
 - Rows are indexed from top to bottom, starting from 0, so the top row is row 0 and the bottom row is row 39.
 - Pieces spawn in SRS orientation such that their bottom minos are in row 19, i.e., right outside the visual board.
+- Layout considers the bottom 22 rows of the board to be inside the board element.
+- This means minos above row 18 may overflow into other UI elements, which is intended.
