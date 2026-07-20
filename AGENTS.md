@@ -16,15 +16,17 @@ Users can choose which two AI models to battle against each other. Once the user
 
 ## Game rules
 
+Refer to the [Hard Drop wiki](https://harddrop.com/wiki/Tetris_Wiki) for Tetris terminology.
+
+### General
+
 - A model loses when they block out.
 - Use the super rotation system (SRS).
 - Zero gravity. Pieces never lock until hard drop.
 - Use the "7-bag" randomizer.
 - Show the next 5 pieces.
 
-Refer to the [Hard Drop wiki](https://harddrop.com/wiki/Tetris_Wiki) for Tetris terminology.
-
-## Possible moves
+### Possible moves
 
 - Hard drop
 - Soft drop: Hard drop that doesn't lock the piece.
@@ -35,3 +37,10 @@ Refer to the [Hard Drop wiki](https://harddrop.com/wiki/Tetris_Wiki) for Tetris 
 - Rotate clockwise
 - Rotate counter-clockwise
 - Hold the piece
+
+### Sizes and locations
+
+- The board is internally 40 rows and 10 columns.
+- The "visual board" is the portion of the board in the bottom 20 rows.
+- Rows are indexed from top to bottom, starting from 0, so the top row is row 0 and the bottom row is row 39.
+- Pieces spawn in SRS orientation such that their bottom minos are in row 19, i.e., right outside the visual board.
