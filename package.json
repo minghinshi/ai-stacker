@@ -1,0 +1,5 @@
+{
+  "name": "ai-stacker",
+  "private": true,
+  "workspaces": ["apps/*"]
+}
