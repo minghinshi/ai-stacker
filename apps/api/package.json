@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@openrouter/sdk": "^1.0.7",
     "express": "^5.2.1"
   },
   "devDependencies": {
