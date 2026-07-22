@@ -1,5 +1,16 @@
 {
   "name": "ai-stacker",
   "private": true,
-  "workspaces": ["apps/*"]
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "lint": "oxlint",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.60.0",
+    "oxlint": "^1.75.0"
+  }
 }
