@@ -1,9 +1,6 @@
 {
   "name": "ai-stacker",
   "private": true,
-  "workspaces": [
-    "apps/*"
-  ],
   "scripts": {
     "lint": "oxlint",
     "fmt": "oxfmt",
@@ -12,8 +9,5 @@
   "devDependencies": {
     "oxfmt": "^0.60.0",
     "oxlint": "^1.75.0"
-  },
-  "allowScripts": {
-    "@openrouter/sdk@1.0.7": true
   }
 }
