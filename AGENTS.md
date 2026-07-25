@@ -11,8 +11,8 @@ Current status: Implementing AI agent. 1v1 not yet implemented.
 ## Architecture
 
 - Monorepo using `pnpm` workspaces.
-- Client: `apps/api`. Uses TypeScript + React Compiler + Vite.
-- Server: `apps/web`. Uses TypeScript + Express.
+- Client: `apps/web`. Uses TypeScript + React Compiler + Vite.
+- Server: `apps/api`. Uses TypeScript + Express.
 - The linter `oxlint` and formatter `oxfmt` are installed at the monorepo root.
 
 ## Testing instructions
