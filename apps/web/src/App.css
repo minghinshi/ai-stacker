@@ -159,3 +159,10 @@
     outline-offset: 2px;
   }
 }
+
+/* --- Agent status --- */
+
+button.new-game-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
