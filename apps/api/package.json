@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openrouter/sdk": "^1.0.7",
+    "@openrouter/sdk": "^1.1.6",
     "express": "^5.2.1"
   },
   "devDependencies": {
