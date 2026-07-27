@@ -18,9 +18,9 @@ Current status: Implementing AI agent. 1v1 not yet implemented.
 ## Testing instructions
 
 - After editing the code, run the following scripts:
-  - `npm run lint` in the monorepo root
-  - `npm run build` in the workspace you modified
-  - No need to run tests. There aren't any tests yet.
+  - `pnpm run lint` in the monorepo root
+  - `pnpm run build` in the workspace you modified
+  - `pnpm run test` in the workspace you modified. The server has no tests, so skip this step if you only modified the server
 - Fix any warnings or errors except `eslint(complexity)`.
 - Do not commit to Git. I will do it for you.
 
