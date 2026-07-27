@@ -21,7 +21,7 @@ Current status: Implementing AI agent. 1v1 not yet implemented.
   - `npm run lint` in the monorepo root
   - `npm run build` in the workspace you modified
   - No need to run tests. There aren't any tests yet.
-- Fix any warnings or errors.
+- Fix any warnings or errors except `eslint(complexity)`.
 - Do not commit to Git. I will do it for you.
 
 ## Game rules
