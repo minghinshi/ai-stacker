@@ -2,12 +2,13 @@
   "name": "ai-stacker",
   "private": true,
   "scripts": {
-    "lint": "oxlint",
+    "lint": "oxlint --type-aware",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check"
   },
   "devDependencies": {
     "oxfmt": "^0.60.0",
-    "oxlint": "^1.75.0"
+    "oxlint": "^1.75.0",
+    "oxlint-tsgolint": "^7.0.2001"
   }
 }
