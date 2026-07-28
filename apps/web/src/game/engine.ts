@@ -218,6 +218,8 @@ export function createInitialState(): GameState {
   };
 }
 
+// Covered by unit tests.
+// oxlint-disable-next-line complexity
 export function reducer(state: GameState, action: GameAction): GameState {
   if (action.type === "NEW_GAME") return createInitialState();
   if (state.isGameOver) return state;
