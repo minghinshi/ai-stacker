@@ -40,6 +40,9 @@ generateRouter.post("/generate", async (req, res): Promise<void> => {
     return;
   }
 
+  // Print prompt for debug
+  console.log("[prompt] " + prompt);
+
   let result: ChatResult;
   try {
     const response = await openRouter.chat.send({
@@ -73,4 +76,16 @@ generateRouter.post("/generate", async (req, res): Promise<void> => {
 
   const body: GenerateResponseBody = { content };
   res.status(200).json(body);
+
+  const rawReasoning = firstChoice.message.reasoning;
+
+  let reasoning = "";
+  if (typeof rawReasoning === "string") {
+    reasoning = rawReasoning;
+  }
+  // rawReasoning follows the same logic as rawContent
+
+  // Print reasoning and response tokens for debug
+  console.log("[reasoning] " + reasoning);
+  console.log("[response] " + content);
 });
