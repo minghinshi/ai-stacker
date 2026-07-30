@@ -6,7 +6,8 @@ AI stacker is a toy project for learning building applications that use AI model
 
 Users can choose which two AI models to battle against each other. Once the user starts the game, both models undergo an agent loop as follows: The web application will send the AI model the state of the game, including the well and the next pieces. The AI model will respond with the sequence of actions to place the next piece. So, to place an I piece vertically at column 1, the model responds with "rotate CCW, DAS to the left, hard drop". The game continues until either a model loses or 2 minutes have elapsed.
 
-Current status: Implementing AI agent. 1v1 not yet implemented.
+- Current status: Implementing AI agent. 1v1 not yet implemented.
+- Do not use test-driven development unless I tell you to. Not all code is suitable for testing.
 
 ## Architecture
 
@@ -14,6 +15,7 @@ Current status: Implementing AI agent. 1v1 not yet implemented.
 - Client: `apps/web`. Uses TypeScript + React Compiler + Vite.
 - Server: `apps/api`. Uses TypeScript + Express.
 - The linter `oxlint` and formatter `oxfmt` are installed at the monorepo root.
+- Vitest is installed in the client. No test runners are installed in the server.
 
 ## Testing instructions
 
