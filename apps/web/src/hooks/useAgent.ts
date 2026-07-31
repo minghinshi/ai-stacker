@@ -72,6 +72,8 @@ export function useAgent(
       timerRef.current = setTimeout(() => runMoves(moves, index + 1), MOVE_INTERVAL_MS);
     };
 
+    // Covered by tests in ./useAgent.test.ts
+    // oxlint-disable-next-line complexity
     async function requestNext(): Promise<void> {
       if (cancelledRef.current) return;
       if (stateRef.current.isGameOver) {
