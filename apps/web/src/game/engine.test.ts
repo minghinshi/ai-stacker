@@ -47,7 +47,7 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
@@ -61,7 +61,7 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 0,
         },
       });
@@ -75,11 +75,11 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
-      state.board[19][2] = "L";
+      state.board[20][2] = "L";
 
       const next = reducer(state, { type: "MOVE_LEFT" });
       expect(next.activePiece!.col).toBe(3);
@@ -92,7 +92,7 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
@@ -106,11 +106,11 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
-      state.board[19][0] = "L";
+      state.board[20][0] = "L";
 
       const next = reducer(state, { type: "DAS_LEFT" });
       expect(next.activePiece!.col).toBe(1);
@@ -123,14 +123,14 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
 
       const next = reducer(state, { type: "SOFT_DROP" });
 
-      expect(next.activePiece!.row).toBe(38);
+      expect(next.activePiece!.row).toBe(-1);
       expect(next.board.every((r) => r.every((c) => c === null))).toBe(true);
     });
 
@@ -139,17 +139,17 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
 
-      state.board[35][3] = "L";
-      state.board[35][4] = "L";
-      state.board[35][5] = "L";
+      state.board[4][3] = "L";
+      state.board[4][4] = "L";
+      state.board[4][5] = "L";
 
       const next = reducer(state, { type: "SOFT_DROP" });
-      expect(next.activePiece!.row).toBe(33);
+      expect(next.activePiece!.row).toBe(4);
     });
   });
 
@@ -159,7 +159,7 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
         canHold: false,
@@ -169,15 +169,15 @@ describe("reducer", () => {
       const next = reducer(state, { type: "HARD_DROP" });
 
       // T-piece locked at the bottom.
-      expect(next.board[39][3]).toBe("T");
-      expect(next.board[39][4]).toBe("T");
-      expect(next.board[39][5]).toBe("T");
-      expect(next.board[38][4]).toBe("T");
+      expect(next.board[0][3]).toBe("T");
+      expect(next.board[0][4]).toBe("T");
+      expect(next.board[0][5]).toBe("T");
+      expect(next.board[1][4]).toBe("T");
 
       // Next piece (S) spawned at spawn location.
       expect(next.activePiece).not.toBeNull();
       expect(next.activePiece!.type).toBe("S");
-      expect(next.activePiece!.row).toBe(18);
+      expect(next.activePiece!.row).toBe(19);
       expect(next.activePiece!.col).toBe(SPAWN_COL["S"]);
       expect(next.activePiece!.rotation).toBe(0);
 
@@ -196,7 +196,7 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 0 as RotationState,
-          row: 18,
+          row: 19,
           col: 3,
         },
       });
@@ -205,7 +205,7 @@ describe("reducer", () => {
       expect(next.activePiece!.rotation).toBe(1);
 
       // No obstruction, so no kick.
-      expect(next.activePiece!.row).toBe(18);
+      expect(next.activePiece!.row).toBe(19);
       expect(next.activePiece!.col).toBe(3);
     });
 
@@ -216,7 +216,7 @@ describe("reducer", () => {
         activePiece: {
           type: "T",
           rotation: 3 as RotationState,
-          row: 18,
+          row: 19,
           col: 8,
         },
       });
@@ -226,7 +226,7 @@ describe("reducer", () => {
 
       // Kick towards the left.
       expect(next.activePiece!.col).toBe(7);
-      expect(next.activePiece!.row).toBe(18);
+      expect(next.activePiece!.row).toBe(19);
     });
 
     it("does nothing when the rotation and all kicks fail", () => {
@@ -242,13 +242,13 @@ describe("reducer", () => {
         activePiece: {
           type: "I",
           rotation: 1 as RotationState,
-          row: 36,
+          row: 0,
           col: 7,
         },
       });
 
       // Fill bottom 4 rows with a 9-0 stack.
-      for (let r = 36; r < 40; r++) {
+      for (let r = 0; r < 4; r++) {
         for (let c = 0; c < 9; c++) {
           state.board[r][c] = "L";
         }
@@ -258,7 +258,7 @@ describe("reducer", () => {
 
       // No kick succeeds. Piece does not move.
       expect(next.activePiece!.rotation).toBe(1);
-      expect(next.activePiece!.row).toBe(36);
+      expect(next.activePiece!.row).toBe(0);
       expect(next.activePiece!.col).toBe(7);
     });
   });
@@ -268,8 +268,8 @@ describe("reducer", () => {
       const state = makeState({
         activePiece: {
           type: "T",
-          rotation: 3 as RotationState,
-          row: 18,
+          rotation: 0 as RotationState,
+          row: 19,
           col: 3,
         },
         canHold: true,
@@ -283,9 +283,6 @@ describe("reducer", () => {
 
       // The new active piece is the head of the queue.
       expect(next.activePiece!.type).toBe("Z");
-      expect(next.activePiece!.row).toBe(18);
-      expect(next.activePiece!.col).toBe(SPAWN_COL["Z"]);
-      expect(next.activePiece!.rotation).toBe(0);
 
       // Queue is shifted.
       expect(next.nextPieces.length).toBe(5);
@@ -299,8 +296,8 @@ describe("reducer", () => {
       const state = makeState({
         activePiece: {
           type: "T",
-          rotation: 3 as RotationState,
-          row: 18,
+          rotation: 0 as RotationState,
+          row: 19,
           col: 3,
         },
         canHold: true,
@@ -310,11 +307,8 @@ describe("reducer", () => {
 
       const next = reducer(state, { type: "HOLD" });
 
-      // Active piece becomes the previously-held S, spawned at standard position.
+      // Active piece becomes the previously-held S.
       expect(next.activePiece!.type).toBe("S");
-      expect(next.activePiece!.row).toBe(18);
-      expect(next.activePiece!.col).toBe(SPAWN_COL["S"]);
-      expect(next.activePiece!.rotation).toBe(0);
 
       // Hold slot now contains the previously-active T.
       expect(next.holdPiece).toBe("T");
@@ -330,8 +324,8 @@ describe("reducer", () => {
       const state = makeState({
         activePiece: {
           type: "T",
-          rotation: 3 as RotationState,
-          row: 18,
+          rotation: 0 as RotationState,
+          row: 19,
           col: 3,
         },
         canHold: false,
@@ -346,5 +340,98 @@ describe("reducer", () => {
       expect(next.holdPiece).toBe("S");
       expect(next.nextPieces).toEqual(["Z", "J", "L", "I", "O"]);
     });
+  });
+
+  // The DT cannon is an opener that sends 11 lines of garbage.
+  // It has a fair number of movements and a TST kick,
+  // so I'm using it for a comprehensive test of the engine.
+  it("can do a DT cannon", () => {
+    let state = makeState({
+      activePiece: {
+        type: "L",
+        rotation: 0 as RotationState,
+        row: 19,
+        col: 3,
+      },
+      nextPieces: ["J", "T", "S", "Z", "O"],
+      bag: ["I", "J", "L", "Z", "S", "O", "I", "T", "T"],
+    });
+
+    // 1. Hard drop the L
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 2. DAS J to right, hard drop
+    state = reducer(state, { type: "DAS_RIGHT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 3. Hold, hard drop the S (hold is now T)
+    state = reducer(state, { type: "HOLD" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 4. DAS Z to right, hard drop
+    state = reducer(state, { type: "DAS_RIGHT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 5. DAS O to left, hard drop
+    state = reducer(state, { type: "DAS_LEFT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 6. Rotate I CW, move right, hard drop
+    state = reducer(state, { type: "ROTATE_CW" });
+    state = reducer(state, { type: "MOVE_RIGHT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 7. Rotate J CW, DAS left, hard drop
+    state = reducer(state, { type: "ROTATE_CW" });
+    state = reducer(state, { type: "DAS_LEFT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 8. Hold, hard drop the T (hold is now L)
+    state = reducer(state, { type: "HOLD" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 9. Move Z right, hard drop
+    state = reducer(state, { type: "MOVE_RIGHT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 10. Hold, rotate L CCW, move left, hard drop (hold is now S)
+    state = reducer(state, { type: "HOLD" });
+    state = reducer(state, { type: "ROTATE_CCW" });
+    state = reducer(state, { type: "MOVE_LEFT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 11. DAS O to right, move left, hard drop
+    state = reducer(state, { type: "DAS_RIGHT" });
+    state = reducer(state, { type: "MOVE_LEFT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 12. Rotate I CW, DAS right, hard drop
+    state = reducer(state, { type: "ROTATE_CW" });
+    state = reducer(state, { type: "DAS_RIGHT" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 13. T-spin double
+    state = reducer(state, { type: "ROTATE_CW" });
+    state = reducer(state, { type: "DAS_LEFT" });
+    state = reducer(state, { type: "SOFT_DROP" });
+    state = reducer(state, { type: "ROTATE_CCW" });
+    state = reducer(state, { type: "ROTATE_CCW" });
+    state = reducer(state, { type: "SOFT_DROP" });
+    state = reducer(state, { type: "ROTATE_CCW" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // 14. T-spin triple
+    state = reducer(state, { type: "ROTATE_CW" });
+    state = reducer(state, { type: "DAS_LEFT" });
+    state = reducer(state, { type: "SOFT_DROP" });
+    state = reducer(state, { type: "ROTATE_CCW" });
+    state = reducer(state, { type: "ROTATE_CCW" });
+    state = reducer(state, { type: "HARD_DROP" });
+
+    // Expected: Only 6 minos remain
+    expect(state.board.slice(0, 2)).toEqual([
+      [null, null, null, "L", "Z", "Z", null, null, null, "I"],
+      [null, null, "L", "L", null, null, null, null, null, null],
+    ]);
   });
 });

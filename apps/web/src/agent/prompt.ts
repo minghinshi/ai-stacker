@@ -1,9 +1,8 @@
 // apps/web/src/agent/prompt.ts
 import type { Cell, GameAction, GameState } from "../game/types";
-import { BOARD_HEIGHT, getPieceCells } from "../game/pieces";
+import { getPieceCells } from "../game/pieces";
 
 const VISUAL_ROWS = 20; // bottom 20 rows of the 40-row board
-const VISUAL_ROW_START = BOARD_HEIGHT - VISUAL_ROWS; // 20
 
 // GameAction values the model is allowed to send. NEW_GAME is excluded —
 // the agent must not start a new game on its own.
@@ -43,7 +42,8 @@ function cellChar(cell: Cell): string {
 function renderVisualBoard(state: GameState): string {
   // Bottom VISUAL_ROWS rows of the board. Row 0 of the snippet = visual top.
   const rows: string[] = [];
-  for (let r = VISUAL_ROW_START; r < BOARD_HEIGHT; r++) {
+  // Top of snippet = highest visible row (largest index in the new system).
+  for (let r = VISUAL_ROWS - 1; r >= 0; r--) {
     rows.push("|" + state.board[r].map(cellChar).join("") + "|");
   }
   return rows.join("\n");

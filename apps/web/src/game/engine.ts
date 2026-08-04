@@ -7,7 +7,14 @@ import type {
   GameState,
   GameAction,
 } from "./types";
-import { BOARD_WIDTH, BOARD_HEIGHT, SPAWN_COL, getPieceCells, getKickOffsets } from "./pieces";
+import {
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  SPAWN_COL,
+  SPAWN_ROW,
+  getPieceCells,
+  getKickOffsets,
+} from "./pieces";
 
 export interface DisplayCell {
   type: PieceType;
@@ -43,14 +50,8 @@ function refillQueue(
 
 // --- Piece helpers -----------------------------------------------------
 
-// Spawn so that there are 20 rows beneath the active piece.
-// The board is 40 rows tall, and rows are 0-indexed top-down (0 = top, 39 = bottom).
-// Every piece's bottom minos sit at bounding-box row 1 in spawn orientation.
-// SPAWN_ROW = 18 -> bottom minos at row 18 + 1 = 19, so there are 20 rows beneath.
-const SPAWN_ROW = 18;
-
 function spawnPiece(type: PieceType): ActivePiece {
-  return { type, rotation: 0, row: SPAWN_ROW, col: SPAWN_COL[type] };
+  return { type, rotation: 0, row: SPAWN_ROW[type], col: SPAWN_COL[type] };
 }
 
 function isValidPosition(board: Board, piece: ActivePiece): boolean {
@@ -59,8 +60,8 @@ function isValidPosition(board: Board, piece: ActivePiece): boolean {
     const r = piece.row + dr;
     const c = piece.col + dc;
     if (c < 0 || c >= BOARD_WIDTH) return false;
-    if (r >= BOARD_HEIGHT) return false;
-    if (r >= 0 && board[r][c] !== null) return false;
+    if (r < 0 || r >= BOARD_HEIGHT) return false;
+    if (board[r][c] !== null) return false;
   }
   return true;
 }
@@ -119,7 +120,7 @@ function clearLines(board: Board): { board: Board; linesCleared: number } {
   const newRows: Cell[][] = Array.from({ length: linesCleared }, () =>
     Array<Cell>(BOARD_WIDTH).fill(null),
   );
-  return { board: [...newRows, ...remaining], linesCleared };
+  return { board: [...remaining, ...newRows], linesCleared };
 }
 
 // --- Game operations ---------------------------------------------------
@@ -137,7 +138,7 @@ function spawnNext(state: GameState): GameState {
 
 function hardDrop(state: GameState): GameState {
   if (!state.activePiece) return state;
-  const dropped = shiftWhileValid(state.board, state.activePiece, 1, 0);
+  const dropped = shiftWhileValid(state.board, state.activePiece, -1, 0);
   const lockedBoard = lockPiece(state.board, dropped);
   const { board: clearedBoard, linesCleared } = clearLines(lockedBoard);
   const newState: GameState = {
@@ -243,7 +244,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
 
     case "SOFT_DROP": {
       if (!state.activePiece) return state;
-      const dropped = shiftWhileValid(state.board, state.activePiece, 1, 0);
+      const dropped = shiftWhileValid(state.board, state.activePiece, -1, 0);
       return { ...state, activePiece: dropped };
     }
 
@@ -278,7 +279,7 @@ export function getDisplayBoard(state: GameState): (DisplayCell | null)[][] {
 
   if (state.activePiece) {
     // Ghost piece (shadow at landing position).
-    const ghost = shiftWhileValid(state.board, state.activePiece, 1, 0);
+    const ghost = shiftWhileValid(state.board, state.activePiece, -1, 0);
     for (const [dr, dc] of getPieceCells(ghost.type, ghost.rotation)) {
       const r = ghost.row + dr;
       const c = ghost.col + dc;
