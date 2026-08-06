@@ -1,8 +1,6 @@
 // apps/web/src/agent/prompt.ts
-import type { Cell, GameAction, GameState } from "../game/types";
-import { getPieceCells } from "../game/pieces";
-
-const VISUAL_ROWS = 20; // bottom 20 rows of the 40-row board
+import type { ActivePiece, GameAction, GameState, PieceType } from "../game/types";
+import { getPieceCells, SPAWN_COL, SPAWN_ROW } from "../game/pieces";
 
 // GameAction values the model is allowed to send. NEW_GAME is excluded —
 // the agent must not start a new game on its own.
@@ -34,45 +32,57 @@ const MOVE_DESCRIPTIONS: Record<AgentMove, string> = {
   HOLD: "Swap the piece with the held piece (once per piece).",
 };
 
-function cellChar(cell: Cell): string {
-  // '.' for empty, '#' for any locked cell (piece type is not exposed).
-  return cell === null ? "." : "#";
+function formatCells(cells: [number, number][]): string {
+  return cells.map(([r, c]) => `(${r}, ${c})`).join(", ");
 }
 
-function renderVisualBoard(state: GameState): string {
-  // Bottom VISUAL_ROWS rows of the board. Row 0 of the snippet = visual top.
-  const rows: string[] = [];
-  // Top of snippet = highest visible row (largest index in the new system).
-  for (let r = VISUAL_ROWS - 1; r >= 0; r--) {
-    rows.push("|" + state.board[r].map(cellChar).join("") + "|");
-  }
-  return rows.join("\n");
+function pieceMinos(piece: ActivePiece): [number, number][] {
+  const cells: [number, number][] = getPieceCells(piece.type, piece.rotation).map(([dr, dc]) => [
+    piece.row + dr,
+    piece.col + dc,
+  ]);
+  return cells;
 }
 
 function renderActivePiece(state: GameState): string {
   const p = state.activePiece;
   if (!p) return "none";
-  const cells = getPieceCells(p.type, p.rotation);
-  const abs = cells.map(([dr, dc]) => `(${p.row + dr}, ${p.col + dc})`).join(", ");
-  return `${p.type} rotation=${p.rotation} at row=${p.row} col=${p.col} minos=[${abs}]`;
+  return `${p.type}: ${formatCells(pieceMinos(p))}`;
+}
+
+function renderHeldPiece(state: GameState): string {
+  if (!state.holdPiece) return "none";
+  // The held piece is shown at the position/rotation it would have after HOLD.
+  const type: PieceType = state.holdPiece;
+  const minos: [number, number][] = getPieceCells(type, 0).map(([dr, dc]) => [
+    SPAWN_ROW[type] + dr,
+    SPAWN_COL[type] + dc,
+  ]);
+  return `${type}: ${formatCells(minos)}`;
+}
+
+function renderOccupiedCells(state: GameState): string {
+  const cells: [number, number][] = [];
+  for (let r = 0; r < state.board.length; r++) {
+    for (let c = 0; c < state.board[r].length; c++) {
+      if (state.board[r][c] !== null) cells.push([r, c]);
+    }
+  }
+  return cells.length > 0 ? formatCells(cells) : "(none)";
 }
 
 export function buildPrompt(state: GameState): string {
-  const nextList = state.nextPieces.length > 0 ? state.nextPieces.join(", ") : "none";
-  const holdStr = state.holdPiece ?? "none";
-
   const moveLines = AGENT_MOVES.map((n) => `- ${n}: ${MOVE_DESCRIPTIONS[n]}`).join("\n");
 
   return `You are playing 1v1 stacker (Tetris). You must place the active piece in the well.
 
-Visual board (bottom 20 rows; '.' = empty, '#' = locked cell, top of snippet = top of the visible playfield):
+Coordinates use the convention (y, x): (0, 0) is the bottom left of the board, +x is right, +y is up.
 
-${renderVisualBoard(state)}
+Placed minos:
+${renderOccupiedCells(state)}
 
 Active piece: ${renderActivePiece(state)}
-Held piece: ${holdStr}
-Next pieces (in order): ${nextList}
-Lines cleared: ${state.linesCleared}
+Held piece (shown where it would appear after HOLD): ${renderHeldPiece(state)}
 
 Possible moves (each is a single action):
 ${moveLines}
