@@ -30,7 +30,7 @@ describe("reducer", () => {
       expect(fresh.board.every((r) => r.every((c) => c === null))).toBe(true);
 
       // Active piece at spawn position.
-      expect(fresh.activePiece).not.toBeNull();
+      expect(fresh.activePiece).toBeDefined();
 
       // Hold is empty and available.
       expect(fresh.holdPiece).toBeNull();
@@ -53,7 +53,7 @@ describe("reducer", () => {
       });
 
       const next = reducer(state, { type: "MOVE_LEFT" });
-      expect(next.activePiece!.col).toBe(2);
+      expect(next.activePiece.col).toBe(2);
     });
 
     it("does nothing when the wall is immediately to the left", () => {
@@ -67,7 +67,7 @@ describe("reducer", () => {
       });
 
       const next = reducer(state, { type: "MOVE_LEFT" });
-      expect(next.activePiece!.col).toBe(0);
+      expect(next.activePiece.col).toBe(0);
     });
 
     it("does nothing when a mino is immediately to the left", () => {
@@ -82,7 +82,7 @@ describe("reducer", () => {
       state.board[20][2] = "L";
 
       const next = reducer(state, { type: "MOVE_LEFT" });
-      expect(next.activePiece!.col).toBe(3);
+      expect(next.activePiece.col).toBe(3);
     });
   });
 
@@ -98,7 +98,7 @@ describe("reducer", () => {
       });
 
       const next = reducer(state, { type: "DAS_LEFT" });
-      expect(next.activePiece!.col).toBe(0);
+      expect(next.activePiece.col).toBe(0);
     });
 
     it("stops just before the mino to the left", () => {
@@ -113,7 +113,7 @@ describe("reducer", () => {
       state.board[20][0] = "L";
 
       const next = reducer(state, { type: "DAS_LEFT" });
-      expect(next.activePiece!.col).toBe(1);
+      expect(next.activePiece.col).toBe(1);
     });
   });
 
@@ -130,7 +130,7 @@ describe("reducer", () => {
 
       const next = reducer(state, { type: "SOFT_DROP" });
 
-      expect(next.activePiece!.row).toBe(-1);
+      expect(next.activePiece.row).toBe(-1);
       expect(next.board.every((r) => r.every((c) => c === null))).toBe(true);
     });
 
@@ -149,7 +149,7 @@ describe("reducer", () => {
       state.board[4][5] = "L";
 
       const next = reducer(state, { type: "SOFT_DROP" });
-      expect(next.activePiece!.row).toBe(4);
+      expect(next.activePiece.row).toBe(4);
     });
   });
 
@@ -175,11 +175,10 @@ describe("reducer", () => {
       expect(next.board[1][4]).toBe("T");
 
       // Next piece (S) spawned at spawn location.
-      expect(next.activePiece).not.toBeNull();
-      expect(next.activePiece!.type).toBe("S");
-      expect(next.activePiece!.row).toBe(19);
-      expect(next.activePiece!.col).toBe(SPAWN_COL["S"]);
-      expect(next.activePiece!.rotation).toBe(0);
+      expect(next.activePiece.type).toBe("S");
+      expect(next.activePiece.row).toBe(19);
+      expect(next.activePiece.col).toBe(SPAWN_COL["S"]);
+      expect(next.activePiece.rotation).toBe(0);
 
       // Queue is shifted.
       expect(next.nextPieces.length).toBe(5);
@@ -202,11 +201,11 @@ describe("reducer", () => {
       });
 
       const next = reducer(state, { type: "ROTATE_CW" });
-      expect(next.activePiece!.rotation).toBe(1);
+      expect(next.activePiece.rotation).toBe(1);
 
       // No obstruction, so no kick.
-      expect(next.activePiece!.row).toBe(19);
-      expect(next.activePiece!.col).toBe(3);
+      expect(next.activePiece.row).toBe(19);
+      expect(next.activePiece.col).toBe(3);
     });
 
     it("rotates clockwise and applies a kick", () => {
@@ -222,11 +221,11 @@ describe("reducer", () => {
       });
 
       const next = reducer(state, { type: "ROTATE_CW" });
-      expect(next.activePiece!.rotation).toBe(0);
+      expect(next.activePiece.rotation).toBe(0);
 
       // Kick towards the left.
-      expect(next.activePiece!.col).toBe(7);
-      expect(next.activePiece!.row).toBe(19);
+      expect(next.activePiece.col).toBe(7);
+      expect(next.activePiece.row).toBe(19);
     });
 
     it("does nothing when the rotation and all kicks fail", () => {
@@ -257,9 +256,9 @@ describe("reducer", () => {
       const next = reducer(state, { type: "ROTATE_CW" });
 
       // No kick succeeds. Piece does not move.
-      expect(next.activePiece!.rotation).toBe(1);
-      expect(next.activePiece!.row).toBe(0);
-      expect(next.activePiece!.col).toBe(7);
+      expect(next.activePiece.rotation).toBe(1);
+      expect(next.activePiece.row).toBe(0);
+      expect(next.activePiece.col).toBe(7);
     });
   });
 
@@ -282,7 +281,7 @@ describe("reducer", () => {
       expect(next.holdPiece).toBe("T");
 
       // The new active piece is the head of the queue.
-      expect(next.activePiece!.type).toBe("Z");
+      expect(next.activePiece.type).toBe("Z");
 
       // Queue is shifted.
       expect(next.nextPieces.length).toBe(5);
@@ -308,7 +307,7 @@ describe("reducer", () => {
       const next = reducer(state, { type: "HOLD" });
 
       // Active piece becomes the previously-held S.
-      expect(next.activePiece!.type).toBe("S");
+      expect(next.activePiece.type).toBe("S");
 
       // Hold slot now contains the previously-active T.
       expect(next.holdPiece).toBe("T");
@@ -340,6 +339,26 @@ describe("reducer", () => {
       expect(next.holdPiece).toBe("S");
       expect(next.nextPieces).toEqual(["Z", "J", "L", "I", "O"]);
     });
+  });
+
+  it("does nothing once the game is over", () => {
+    const state = makeState({ isGameOver: true });
+
+    // Every action should leave the state untouched.
+    for (const action of [
+      { type: "MOVE_LEFT" as const },
+      { type: "MOVE_RIGHT" as const },
+      { type: "ROTATE_CW" as const },
+      { type: "ROTATE_CCW" as const },
+      { type: "SOFT_DROP" as const },
+      { type: "HARD_DROP" as const },
+      { type: "DAS_LEFT" as const },
+      { type: "DAS_RIGHT" as const },
+      { type: "HOLD" as const },
+    ]) {
+      const next = reducer(state, action);
+      expect(next).toEqual(state);
+    }
   });
 
   // The DT cannon is an opener that sends 11 lines of garbage.

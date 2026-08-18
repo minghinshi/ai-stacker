@@ -131,27 +131,28 @@ function spawnNext(state: GameState): GameState {
   const { queue, bag } = refillQueue(rest, state.bag, NEXT_PIECES_COUNT);
   const activePiece = spawnPiece(nextType);
   if (!isValidPosition(state.board, activePiece)) {
-    return { ...state, activePiece: null, nextPieces: queue, bag, isGameOver: true, canHold: true };
+    // Block-out: keep the offending piece so the player can see why they
+    // lost, and flag the game as over. The `isGameOver` short-circuit in the
+    // reducer prevents any further actions from being applied.
+    return { ...state, activePiece, nextPieces: queue, bag, isGameOver: true, canHold: true };
   }
   return { ...state, activePiece, nextPieces: queue, bag, canHold: true };
 }
 
 function hardDrop(state: GameState): GameState {
-  if (!state.activePiece) return state;
   const dropped = shiftWhileValid(state.board, state.activePiece, -1, 0);
   const lockedBoard = lockPiece(state.board, dropped);
   const { board: clearedBoard, linesCleared } = clearLines(lockedBoard);
   const newState: GameState = {
     ...state,
     board: clearedBoard,
-    activePiece: null,
     linesCleared: state.linesCleared + linesCleared,
   };
   return spawnNext(newState);
 }
 
 function hold(state: GameState): GameState {
-  if (!state.activePiece || !state.canHold) return state;
+  if (!state.canHold) return state;
   const currentType = state.activePiece.type;
 
   if (state.holdPiece === null) {
@@ -161,10 +162,12 @@ function hold(state: GameState): GameState {
     const { queue, bag } = refillQueue(rest, state.bag, NEXT_PIECES_COUNT);
     const activePiece = spawnPiece(nextType);
     if (!isValidPosition(state.board, activePiece)) {
+      // Block-out on hold: keep the offending piece; canHold is intentionally
+      // left as false (hold was consumed) but the game is over anyway.
       return {
         ...state,
         holdPiece: currentType,
-        activePiece: null,
+        activePiece,
         nextPieces: queue,
         bag,
         canHold: false,
@@ -185,10 +188,11 @@ function hold(state: GameState): GameState {
   const heldType = state.holdPiece;
   const activePiece = spawnPiece(heldType);
   if (!isValidPosition(state.board, activePiece)) {
+    // Block-out on swap: keep the offending piece so the player can see why.
     return {
       ...state,
       holdPiece: currentType,
-      activePiece: null,
+      activePiece,
       canHold: false,
       isGameOver: true,
     };
@@ -228,7 +232,6 @@ export function reducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "MOVE_LEFT":
     case "MOVE_RIGHT": {
-      if (!state.activePiece) return state;
       const dc = action.type === "MOVE_LEFT" ? -1 : 1;
       const moved = tryMove(state.board, state.activePiece, 0, dc);
       return moved ? { ...state, activePiece: moved } : state;
@@ -236,14 +239,12 @@ export function reducer(state: GameState, action: GameAction): GameState {
 
     case "DAS_LEFT":
     case "DAS_RIGHT": {
-      if (!state.activePiece) return state;
       const dc = action.type === "DAS_LEFT" ? -1 : 1;
       const moved = shiftWhileValid(state.board, state.activePiece, 0, dc);
       return { ...state, activePiece: moved };
     }
 
     case "SOFT_DROP": {
-      if (!state.activePiece) return state;
       const dropped = shiftWhileValid(state.board, state.activePiece, -1, 0);
       return { ...state, activePiece: dropped };
     }
@@ -253,7 +254,6 @@ export function reducer(state: GameState, action: GameAction): GameState {
 
     case "ROTATE_CW":
     case "ROTATE_CCW": {
-      if (!state.activePiece) return state;
       const rotated = tryRotate(
         state.board,
         state.activePiece,
@@ -277,24 +277,23 @@ export function getDisplayBoard(state: GameState): (DisplayCell | null)[][] {
     row.map((cell) => (cell ? { type: cell, kind: "locked" as const } : null)),
   );
 
-  if (state.activePiece) {
-    // Ghost piece (shadow at landing position).
-    const ghost = shiftWhileValid(state.board, state.activePiece, -1, 0);
-    for (const [dr, dc] of getPieceCells(ghost.type, ghost.rotation)) {
-      const r = ghost.row + dr;
-      const c = ghost.col + dc;
-      if (r >= 0 && r < BOARD_HEIGHT && c >= 0 && c < BOARD_WIDTH && !display[r][c]) {
-        display[r][c] = { type: ghost.type, kind: "ghost" };
-      }
+  // Ghost piece (shadow at landing position). The active piece overwrites
+  // ghost cells in the loop below where they overlap.
+  const ghost = shiftWhileValid(state.board, state.activePiece, -1, 0);
+  for (const [dr, dc] of getPieceCells(ghost.type, ghost.rotation)) {
+    const r = ghost.row + dr;
+    const c = ghost.col + dc;
+    if (r >= 0 && r < BOARD_HEIGHT && c >= 0 && c < BOARD_WIDTH && !display[r][c]) {
+      display[r][c] = { type: ghost.type, kind: "ghost" };
     }
+  }
 
-    // Active piece (overwrites ghost where they overlap).
-    for (const [dr, dc] of getPieceCells(state.activePiece.type, state.activePiece.rotation)) {
-      const r = state.activePiece.row + dr;
-      const c = state.activePiece.col + dc;
-      if (r >= 0 && r < BOARD_HEIGHT && c >= 0 && c < BOARD_WIDTH) {
-        display[r][c] = { type: state.activePiece.type, kind: "active" };
-      }
+  // Active piece (overwrites ghost where they overlap).
+  for (const [dr, dc] of getPieceCells(state.activePiece.type, state.activePiece.rotation)) {
+    const r = state.activePiece.row + dr;
+    const c = state.activePiece.col + dc;
+    if (r >= 0 && r < BOARD_HEIGHT && c >= 0 && c < BOARD_WIDTH) {
+      display[r][c] = { type: state.activePiece.type, kind: "active" };
     }
   }
 

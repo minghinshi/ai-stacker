@@ -46,7 +46,6 @@ function pieceMinos(piece: ActivePiece): [number, number][] {
 
 function renderActivePiece(state: GameState): string {
   const p = state.activePiece;
-  if (!p) return "none";
   return `${p.type}: ${formatCells(pieceMinos(p))}`;
 }
 
