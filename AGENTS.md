@@ -76,3 +76,28 @@ row 2 . X .
 row 1 X X X
 row 0 . . .
 ```
+
+## AI agent design
+
+- The board is presented in the AI agent's prompt as a list of coordinates of placed minos.
+  - This is because some studies found that large language models perform the best in spatial reasoning tasks when given coordinates.
+- The AI agent can use either _simple placement mode_ or _advanced placement mode_ to place a piece.
+
+### Simple placement mode
+
+In simple placement mode, the application computes all possible final positions of the active piece reachable with _finesse_.
+
+- The majority of placement positions is reached by moving left/right and rotating, followed by a hard drop.
+- There are at most 34 such positions, making it possible to enumerate them in the prompt and ask the AI agent to choose one.
+- In addition, we know the sequence of movements needed to reach each position in the fewest keystrokes, known as finesse.
+- Refer to <https://four.lol/mid-game/finesse> to learn more about finesse.
+- The application simulates all possible finesse movements and reads the final positions of the active piece, then lists all final positions in the prompt and asks the AI agent to choose one. Finally, the application executes the finesse movement corresponding to the position the agent chose.
+- This offloads from the AI agent the burden of calculating where the active piece would go after a move.
+- Finesse may fail if there are existing minos in row 18 or above. If this happens, the application uses advanced placement mode instead.
+
+### Advanced placement mode
+
+In advanced placement mode, the AI agent responds with a sequence of moves that places the active piece.
+
+- This allows the AI agent to perform kicks, T-spins, etc.
+- However, AI agents use many tokens to think about how to respond, and the gameplay performance is poor.
