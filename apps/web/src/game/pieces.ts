@@ -1,4 +1,4 @@
-import type { PieceType, RotationState } from "./types";
+import type { ActivePiece, PieceType, RotationState } from "./types";
 
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 40;
@@ -377,4 +377,12 @@ export function getPreviewGrid(type: PieceType): (PieceType | null)[][] {
     grid[r - minR + offsetR][c - minC + offsetC] = type;
   }
   return grid;
+}
+
+export function getMinoPositions(piece: ActivePiece): [number, number][] {
+  const cells: [number, number][] = getPieceCells(piece.type, piece.rotation).map(([dr, dc]) => [
+    piece.row + dr,
+    piece.col + dc,
+  ]);
+  return cells;
 }

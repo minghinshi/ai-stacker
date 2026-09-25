@@ -50,7 +50,10 @@ function refillQueue(
 
 // --- Piece helpers -----------------------------------------------------
 
-function spawnPiece(type: PieceType): ActivePiece {
+/**
+ * Returns an ActivePiece in its spawn position and rotation.
+ */
+export function spawnPiece(type: PieceType): ActivePiece {
   return { type, rotation: 0, row: SPAWN_ROW[type], col: SPAWN_COL[type] };
 }
 
