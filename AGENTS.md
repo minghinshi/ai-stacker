@@ -50,11 +50,54 @@ Refer to the [Hard Drop wiki](https://harddrop.com/wiki/Tetris_Wiki) for Tetris 
 - Rotate counter-clockwise
 - Hold the piece
 
-### Sizes and locations
+### Board definitions
 
 - The board is internally 40 rows and 10 columns. All 40 rows are rendered.
 - The _visual board_ is the portion of the board in the bottom 20 rows.
-- Rows are indexed from top to bottom, starting from 0, so the top row is row 0 and the bottom row is row 39.
-- Pieces spawn in SRS orientation such that their bottom minos are in row 19, i.e., right outside the visual board.
+- Rows are indexed from bottom to top, starting from 0, so the bottom row is row 0 and the top row is row 39.
 - Layout considers the bottom 22 rows of the board to be inside the board element.
-- This means minos above row 18 may overflow into other UI elements, which is intended.
+- This means minos at or above row 22 may overflow into other UI elements, which is intended.
+
+### Piece definitions
+
+- Pieces spawn in SRS orientation such that their bottom minos are in row 20, i.e., right outside the visual board.
+- The _bounding box_ of a piece is the smallest square containing all rotation states of a piece. It is centred at the centre of rotation of the piece.
+  - The I piece has a 4x4 bounding box.
+  - The O piece has a 2x2 bounding box.
+  - The remaining pieces has a 3x3 bounding box.
+- The position of a piece is the position of its _anchor_, the bottom left cell of its bounding box.
+- The shape of a piece in a particular rotation state is defined by offsets from the piece's anchor.
+  - For example, the spawn rotation of the T piece is defined as (1, 0), (1, 1), (1, 2), (2, 1), where coordinates are (row, col).
+  - This corresponds to the following ASCII art showing cells in the T piece's bounding box, where "X" = filled and "." = empty:
+
+```
+col   0 1 2
+row 2 . X .
+row 1 X X X
+row 0 . . .
+```
+
+## AI agent design
+
+- The board is presented in the AI agent's prompt as a list of coordinates of placed minos.
+  - This is because some studies found that large language models perform the best in spatial reasoning tasks when given coordinates.
+- The AI agent can use either _simple placement mode_ or _advanced placement mode_ to place a piece.
+
+### Simple placement mode
+
+In simple placement mode, the application computes all possible final positions of the active piece reachable with _finesse_.
+
+- The majority of placement positions is reached by moving left/right and rotating, followed by a hard drop.
+- There are at most 34 such positions, making it possible to enumerate them in the prompt and ask the AI agent to choose one.
+- In addition, we know the sequence of movements needed to reach each position in the fewest keystrokes, known as finesse.
+- Refer to <https://four.lol/mid-game/finesse> to learn more about finesse.
+- The application simulates all possible finesse movements and reads the final positions of the active piece, then lists all final positions in the prompt and asks the AI agent to choose one. Finally, the application executes the finesse movement corresponding to the position the agent chose.
+- This offloads from the AI agent the burden of calculating where the active piece would go after a move.
+- Finesse may fail if there are existing minos in row 18 or above. If this happens, the application uses advanced placement mode instead.
+
+### Advanced placement mode
+
+In advanced placement mode, the AI agent responds with a sequence of moves that places the active piece.
+
+- This allows the AI agent to perform kicks, T-spins, etc.
+- However, AI agents use many tokens to think about how to respond, and the gameplay performance is poor.

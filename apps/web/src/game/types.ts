@@ -19,7 +19,7 @@ export interface ActivePiece {
 
 export interface GameState {
   board: Board;
-  activePiece: ActivePiece | null;
+  activePiece: ActivePiece;
   holdPiece: PieceType | null;
   canHold: boolean;
   nextPieces: PieceType[];

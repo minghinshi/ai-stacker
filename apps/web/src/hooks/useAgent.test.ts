@@ -44,10 +44,14 @@ describe("useAgent.requestNext", () => {
   });
 
   it("plays each move in a valid response in order", async () => {
-    mockFetchOk('["HOLD", "HARD_DROP"]');
+    // Create a board tall enough to trigger advanced placement mode
+    const gameState = createInitialState();
+    gameState.board[18][0] = "O";
+
+    mockFetchOk('["MOVE_RIGHT", "HARD_DROP"]');
 
     const dispatch = vi.fn();
-    const { result } = renderHook(() => useAgent(createInitialState(), dispatch));
+    const { result } = renderHook(() => useAgent(gameState, dispatch));
 
     await act(async () => {
       result.current.start();
@@ -55,7 +59,7 @@ describe("useAgent.requestNext", () => {
 
     // First move is made right after the response.
     expect(dispatch).toHaveBeenCalledTimes(1);
-    expect(dispatch).toHaveBeenLastCalledWith({ type: "HOLD" });
+    expect(dispatch).toHaveBeenLastCalledWith({ type: "MOVE_RIGHT" });
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(200);
@@ -67,7 +71,11 @@ describe("useAgent.requestNext", () => {
   });
 
   it("sets status to 'error' when the response contains an unknown move", async () => {
-    mockFetchOk('["HOLD", "DROP"]');
+    // Create a board tall enough to trigger advanced placement mode
+    const gameState = createInitialState();
+    gameState.board[18][0] = "O";
+
+    mockFetchOk('["MOVE_RIGHT", "DROP"]');
 
     const dispatch = vi.fn();
     const { result } = renderHook(() => useAgent(createInitialState(), dispatch));

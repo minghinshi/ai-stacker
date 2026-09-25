@@ -1,7 +1,7 @@
 // apps/web/src/hooks/useAgent.ts
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameAction, GameState } from "../game/types";
-import { buildPrompt, parseMoveResponse, type AgentMove } from "../agent/prompt";
+import { buildPrompt, parseMoveResponse, parsePlacementResponse, type AgentMove } from "../agent/prompt";
 
 const API_URL = "http://localhost:3001/api/generate";
 const MODEL = "minimax/minimax-m3";
@@ -90,7 +90,7 @@ export function useAgent(
         const res = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: MODEL, prompt }),
+          body: JSON.stringify({ model: MODEL, prompt: prompt.text }),
         });
         if (!res.ok) {
           const text = await res.text().catch(() => "");
@@ -108,7 +108,10 @@ export function useAgent(
 
       let moves: AgentMove[];
       try {
-        moves = parseMoveResponse(raw);
+        moves =
+          prompt.mode === "simple"
+            ? parsePlacementResponse(raw, prompt.placements)
+            : parseMoveResponse(raw);
       } catch (err) {
         if (cancelledRef.current) return;
         const message = err instanceof Error ? err.message : String(err);

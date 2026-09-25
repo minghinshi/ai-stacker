@@ -36,6 +36,9 @@ export function setupCanvas(canvas: HTMLCanvasElement): CanvasSize | null {
  * @param opts.bg     Background fill color for empty cells. null = transparent.
  * @param opts.dimmed When true, draws filled minos at reduced alpha.
  */
+
+// Rendering code, will not be tested
+// oxlint-disable-next-line complexity
 export function drawMinoGrid(
   canvas: HTMLCanvasElement,
   grid: MinoCell[][],
@@ -67,16 +70,24 @@ export function drawMinoGrid(
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const cell = grid[r][c];
+      if (!cell) continue;
+
+      // Calculate the top left of the mino
+      // Grids are internally represented as +x = right and +y = up
+      // When rendering, the y-axis needs to be inverted
       const x = c * cellW;
-      const y = r * cellH;
+      const y = cssHeight - (r + 1) * cellH;
+
       // 0.5px inset gives a 1px gap between minos (matches the old grid gap).
       const inset = 0.5;
       const rx = x + inset;
       const ry = y + inset;
       const rw = cellW - inset * 2;
       const rh = cellH - inset * 2;
-      if (!cell) continue;
+
       const color = PIECE_COLORS[cell.type];
+
+      // Ghost minos, for showing drop location
       if (cell.kind === "ghost") {
         ctx.globalAlpha = 0.35;
         ctx.strokeStyle = color;
@@ -85,13 +96,10 @@ export function drawMinoGrid(
         ctx.globalAlpha = opts.dimmed ? 0.3 : 1;
         continue;
       }
-      // filled
+
+      // Filled minos, for active and placed pieces
       ctx.fillStyle = color;
       ctx.fillRect(rx, ry, rw, rh);
-      // subtle inner highlight border
-      ctx.strokeStyle = "rgba(255,255,255,0.15)";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(rx + 0.5, ry + 0.5, rw - 1, rh - 1);
     }
   }
   ctx.restore();

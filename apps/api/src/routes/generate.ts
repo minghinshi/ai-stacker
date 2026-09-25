@@ -51,7 +51,7 @@ generateRouter.post("/generate", async (req, res): Promise<void> => {
         messages: [{ role: "user", content: prompt }],
         stream: false,
         // It's a problem if the model thinks for too long
-        maxCompletionTokens: 1000,
+        maxCompletionTokens: 5000,
       },
     });
     if (!isChatResult(response)) {
